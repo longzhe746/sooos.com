@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from blog.forms import UserForm
 from django.http import HttpRequest
 from django.http import HttpResponse
 
@@ -38,3 +39,38 @@ def edit_action(request):
     article.content = content
     article.save()
     return render(request, 'blog/article_page.html', {'article': article})
+
+def login(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user_id = form.cleaned_data['user_id']
+            password = form.cleaned_data['password']
+            user = models.User.objects.filter(user_id__exact=user_id,password__exact=password)
+            if user:
+                print('登录成功')
+                articles = models.Article.objects.all()
+                return redirect('/blog/index', {'articles': articles})
+            else:
+                return HttpResponse("登录ID或密码错误<a href='/blog/login'>登录</a>")
+
+    else:
+        form = UserForm().as_ul()
+    return render(request, 'blog/login.html', {'form': form})
+
+def register(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = models.User()
+            print(form.cleaned_data)
+            user.user_id = form.cleaned_data['user_id']
+            user.password = form.cleaned_data['password']
+
+            user.save()
+        return login(request)
+    else:
+        form = UserForm().as_ul()
+    return render(request, 'blog/register.html', {'form': form})
+
+
