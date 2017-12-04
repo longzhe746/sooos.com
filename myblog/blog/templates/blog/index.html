@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+</head>
+<h1>
+	<a href="{% url 'blog:edit_page' 0 %}">新文章</a>
+
+</h1>
+<body>
+	{% for article in articles %}
+		<a href="{% url 'blog:article_page' article.id %}">{{ article.title }}</a>
+		<br/>
+	{% endfor %}
+</body>
+</html>

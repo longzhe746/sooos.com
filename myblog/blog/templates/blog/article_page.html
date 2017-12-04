@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>查看文章</title>
+</head>
+<body>
+
+		<h1>{{ article.title }}</h1></br>
+
+		<h3>{{ article.content }}</h3></br>
+
+		<a href="{% url 'blog:edit_page' article.id %}">修改文章</a>
+</body>
+</html>
