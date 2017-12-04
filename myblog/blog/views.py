@@ -13,7 +13,13 @@ def index(request):
     # article = models.Article.objects.get(pk=1) 获取一行
     articles = models.Article.objects.all()
     return render(request, 'blog/index.html', {'articles': articles})
-
+'''
+Test Request
+'''
+def index2(request):
+    # article = models.Article.objects.get(pk=1) 获取一行
+    articles = models.Article.objects.all()
+    return render(request, 'blog/index2.html', {'articles': articles})
 
 def article_page(request, article_id):
     article = models.Article.objects.get(pk=article_id)
