@@ -3,7 +3,7 @@
 from django.conf.urls import url
 from . import views
 
-urlpatterns = {
+urlpatterns = [
     url(r'^$', views.index),  # ^开始 $结束
     url(r'^index/$', views.index),  # ^开始 $结束
     url(r'^index_test/$', views.index2),  # ^开始 $结束
@@ -12,4 +12,4 @@ urlpatterns = {
     url(r'^edit/action/$', views.edit_action, name='edit_action'),
     url(r'^login/$', views.login, name='login'),
     url(r'^register/$', views.register, name='register'),
-}
+]

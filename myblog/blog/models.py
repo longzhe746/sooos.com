@@ -3,9 +3,13 @@ from django.db import models
 
 # Create your models here.
 class Article(models.Model):
-    title = models.CharField(max_length=32, default='Title')
-    content = models.TextField(null=True)
-    pub_date = models.DateTimeField(null=True)
+    title = models.CharField(verbose_name='主题',max_length=32, default='Title')
+    content = models.TextField(verbose_name='内容',null=True)
+    pub_date = models.DateTimeField(verbose_name='插入时间',null=True)
+    reg_date = models.DateTimeField(auto_now_add=True,verbose_name='日期')
+
+    class Meta:
+        ordering = ('-pub_date',) # 倒序前面加 -
 
     def __str__(self):
         return self.title
