@@ -17,3 +17,13 @@ class Article(models.Model):
 class User(models.Model):
     user_id = models.CharField(max_length=10)
     password = models.CharField(max_length=32)
+    name = models.CharField(verbose_name='姓名',max_length=32)
+
+    def __str__(self):
+        return self.name
+
+class Comments(models.Model):
+    user = models.ForeignKey(User)
+    name = models.CharField(verbose_name='姓名',max_length=32)
+    def __str__(self):
+        return self.name
