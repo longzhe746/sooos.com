@@ -21,8 +21,7 @@ class MyUserManager(BaseUserManager):
             username = username,
             email=self.normalize_email(email),
             date_joined=now,
-            last_login=now
-
+            last_login=now,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -30,7 +29,7 @@ class MyUserManager(BaseUserManager):
     def create_superuser(self, username, email, password):
         user = self.create_user(username,
                                 email,
-                                password=password)
+                                password=password,)
         user.is_admin  = True
         user.save(using=self._db)
         return  user
@@ -44,7 +43,7 @@ class Member(AbstractBaseUser):
     profile = models.CharField(verbose_name='个人简介',max_length=140,blank=True)
     avatar = models.CharField(verbose_name='头像',max_length=128,blank=True)
     au = models.IntegerField(verbose_name='用户活跃度',default=True)
-    last_ip = models.IPAddressField(verbose_name='上次访问IP',default='0.0.0.0')
+    last_ip = models.GenericIPAddressField(verbose_name='上次访问IP',default='0.0.0.0')
     email_verified = models.BooleanField(verbose_name='邮箱是否验证',default=False)
     date_joined = models.DateTimeField(verbose_name='用户注册时间',default=timezone.now)
     topic_num = models.IntegerField(verbose_name='帖子数',default=0)
