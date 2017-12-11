@@ -1,4 +1,6 @@
 from django.shortcuts import render,redirect
+from django.views import defaults
+
 from blog.forms import UserForm
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -12,6 +14,8 @@ from . import models
 def index(request):
     # article = models.Article.objects.get(pk=1) 获取一行
     articles = models.Article.objects.all()
+    defaults.page_not_found(request, template_name='404.html')
+    defaults.page_not_found()
     return render(request, 'blog/index.html', {'articles': articles})
 '''
 Test Request
