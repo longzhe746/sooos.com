@@ -14,8 +14,6 @@ from . import models
 def index(request):
     # article = models.Article.objects.get(pk=1) 获取一行
     articles = models.Article.objects.all()
-    defaults.page_not_found(request, template_name='404.html')
-    defaults.page_not_found()
     return render(request, 'blog/index.html', {'articles': articles})
 '''
 Test Request
