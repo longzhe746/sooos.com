@@ -48,8 +48,8 @@ class Member(AbstractBaseUser):
     date_joined = models.DateTimeField(verbose_name='用户注册时间',default=timezone.now)
     topic_num = models.IntegerField(verbose_name='帖子数',default=0)
     comment_num = models.IntegerField(verbose_name='评论数',default=0)
-    is_active = models.BooleanField( default=True)
-    is_admin = models.BooleanField( default=False)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -110,7 +110,7 @@ class EmailVerified(models.Model):
         year = self.timestamp.year
         month = self.timestamp.month
         day = self.timestamp.day
-        date = '-'.join([year,month,day])
+        date = '-'.join([str(year), str(month), str(day)])
         token = hashlib.md5((self.ran_str()+date).encode('utf-8')).hexdigest()
         return  token
 
@@ -130,9 +130,9 @@ class FindPass(models.Model):
         year = self.timestamp.year
         month = self.timestamp.month
         day = self.timestamp.day
-        date = '-'.join([year,month,day])
+        date = '-'.join([str(year), str(month), str(day)])
         token = hashlib.md5((self.ran_str()+date).encode('utf-8')).hexdigest()
-        return  token
+        return token
 
     def ran_str(self):
         salt = ''.join(random.sample(string.ascii_letters + string.digits,8))
