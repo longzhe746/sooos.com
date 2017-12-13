@@ -25,16 +25,16 @@ class TopicForm(forms.Form):
         model = Topic
         fields = ('title','content')
 
-    class ReplyForm(forms.Form):
-        content = forms.CharField(label='回复',required=False)
-        def clean_content(self):
-            content = self.cleaned_data.get("content").strip()
-            if len(content) == 0:
-                raise forms.ValidationError("请输入评论内容。。。")
-            elif len(content) > 800:
-                raise forms.ValidationError("评论内容太长。。。")
-            else:
-                return content
-        class Meta:
-            model = Comment
-            fields = ('content',)
+class ReplyForm(forms.Form):
+    content = forms.CharField(label='回复',required=False)
+    def clean_content(self):
+        content = self.cleaned_data.get("content").strip()
+        if len(content) == 0:
+            raise forms.ValidationError("请输入评论内容。。。")
+        elif len(content) > 800:
+            raise forms.ValidationError("评论内容太长。。。")
+        else:
+            return content
+    class Meta:
+        model = Comment
+        fields = ('content',)
