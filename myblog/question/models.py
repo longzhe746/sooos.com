@@ -4,12 +4,12 @@ from django.db import models
 from people.models import Member as User
 from django.db.models.signals import post_save
 # Create your models here.
-
+# 类别
 class Category(models.Model):
     name = models.CharField(max_length=100,verbose_name='类别名称')
     def __str__(self):
         return self.name
-
+# 节点
 class Node(models.Model):
     name = models.CharField(max_length=100,verbose_name='节点名称')
     slug = models.SlugField(max_length=100,verbose_name='url标识符')
@@ -18,7 +18,7 @@ class Node(models.Model):
     category = models.ForeignKey(Category,verbose_name='所属类别')
     def __str__(self):
         return self.name
-
+# 文章
 class Topic(models.Model):
     title = models.CharField(max_length=100,verbose_name='标题')
     content = models.TextField(verbose_name='内容')
@@ -31,7 +31,7 @@ class Topic(models.Model):
     updated_on = models.DateTimeField(blank=True,null=True,verbose_name='发表时间')
     def __str__(self):
         return self.title
-
+# 评论
 class Comment(models.Model):
     content = models.TextField(verbose_name='内容')
     author = models.ForeignKey(User,verbose_name='作者')
@@ -39,7 +39,7 @@ class Comment(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,verbose_name='评论时间')
     def __str__(self):
         return self.content
-
+# 消息
 class Notice(models.Model):
     from_user = models.ForeignKey(User,related_name='+',verbose_name='来自用户')
     to_user = models.ForeignKey(User,related_name='+',verbose_name='接受用户')
@@ -50,7 +50,7 @@ class Notice(models.Model):
     is_deleted = models.BooleanField(default=False)
     def __str__(self):
         return self.content
-
+# 收藏的文章
 class FavoritedTopic(models.Model):
     user = models.ForeignKey(User, verbose_name='用户')
     topic = models.ForeignKey(Topic,verbose_name='主题')
