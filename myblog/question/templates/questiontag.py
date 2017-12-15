@@ -1,6 +1,8 @@
 from django import  template
 from django.template.defaultfilters import stringfilter
 from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
+from django.utils.encoding import force_text
 from question.models import Notice, FavoritedTopic
 from people.models import Member as User
 from people.models import Follower
@@ -50,11 +52,35 @@ def time_to_now(value):
         return '%s 分钟前' % str(delta.seconds // 60)
     return '刚刚'
 
+class BaseRenderer(misaka.HtmlRenderer):
+    def autolink(self,link,is_email):
+        if is_email:
+            return '<a href="mailto:%(link)s">%(link)s</a>' % {'link':link}
+        content = link.replace('http://','').replace('https://','')
+        return '<a href="%s" target="_blank">%s </a>' % (link,content)
+
+class CommentRenderer(BaseRenderer):
+    def header(self,text,level):
+        if level < 4:
+            return '<p>#%s</p>' % text
+        return '<h%d>%s</h%d>' % (level,text,level)
+
+class TopicRenderer(BaseRenderer):
+    pass
+
 @register.filter(is_safe=True)
 @stringfilter
 def my_makedown(value,flag):
-    extionsions = (
+    extensions = (
         misaka.EXT_NO_INTRA_EMPHASIS | misaka.EXT_FENCED_CODE | misaka.EXT_AUTOLINK
         | misaka.EXT_TABLES | misaka.EXT_STRIKETHROUGH | misaka.EXT_SUPERSCRIPT
     )
-    return ''
+    if flag == 'comment':
+        renderer = CommentRenderer(flags=misaka.HTML_ESCAPE | misaka.HTML_HARD_WRAP)
+    else:
+        renderer = TopicRenderer(flags=misaka.HTML_ESCAPE | misaka.HTML_HARD_WRAP)
+
+    md = misaka.Markdown(renderer,extensions=extensions)
+    md = md.renderer(force_text(value))
+
+    return mark_safe(md)
