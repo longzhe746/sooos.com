@@ -35,8 +35,19 @@ def gravatar(user,size=None):
         raise template.TemplateSyntaxError('语法错误。')
 
 @register.simple_tag
-def gravatar_url_for_user(user,size):
-    pass
+def gravatar_url_for_user(user,size=None):
+    if user.avatar and user.avatar != '':
+        img = '' + user.avatar
+        return  img
+    else:
+        email = _get_user(user)
+        return  gravatar_url_for_email(email,size)
+
 @register.simple_tag
-def gravatar_url_for_email(user,size):
-    pass
+def gravatar_url_for_email(user,size=None):
+    gravatar_url = '%savatar/%s' %(GRAVATAR_URL_PREFIX,_get_gravatar_id(user.email))
+
+    parameters = [ p for p in (('d',GRAVATAR_DEFAULT_IMAGE),('s',size or GRAVATAR_DEFAULT_SIZE),('g',GRAVATAR_DEFAULT_RATING))if g[1]]
+    if parameters:
+        gravatar_url += '?' + urllib.parse.urlencode(parameters,doseq=True)
+    return  gravatar_url
