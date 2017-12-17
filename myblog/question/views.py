@@ -10,6 +10,7 @@ from people.models import Member as User
 from django.core.cache import cache
 from django.utils import timezone
 import datetime
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -101,3 +102,6 @@ def topic(request,topic_id):
 
     form = ReplyForm()
     return render(request,'question/topic.html',locals())
+
+def reply(request,topic_id):
+    pass
