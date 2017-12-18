@@ -11,6 +11,9 @@ from django.core.cache import cache
 from django.utils import timezone
 import datetime
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+import re
+from  django.contrib import messages
 
 
 def index(request):
@@ -40,44 +43,47 @@ def index(request):
             topic = Topic.objects.get(id=comment['topic'])
             hot_topics.append(topic)
         cache.set('index_hot_topics', hot_topics, 60)
-    return render(request,'question/index.html',{'topic_list':topic_list,'nodes':nodes,'hot_topics':hot_topics})
+    return render(request, 'question/index.html', {'topic_list': topic_list, 'nodes': nodes, 'hot_topics': hot_topics})
+
 
 def recent(request):
     topic_list = Topic.objects.all().order_by('-created_on')
-    paginator=Paginator(topic_list,NUM_COMMENT_PER_PAGE)
+    paginator = Paginator(topic_list, NUM_COMMENT_PER_PAGE)
     page = request.GET.get('page')
     try:
         topic_list = paginator.page(page)
     except PageNotAnInteger:
         topic_list = paginator.page(1)
     except EmptyPage:
-        topic_list = paginator.page(paginator.num_pages)# 最后一页
+        topic_list = paginator.page(paginator.num_pages)  # 最后一页
 
-    return render(request,'question/recent.html',{'topic_list':topic_list})
+    return render(request, 'question/recent.html', {'topic_list': topic_list})
 
-def node(request,node_slug):
+
+def node(request, node_slug):
     try:
         node = Node.objects.get(slug=node_slug)
     except Node.DoesNotExist:
-        raise  Http404
+        raise Http404
 
     topic_list = Topic.objects.filter(node=node).order_by('-created_on')
-    paginator=Paginator(topic_list,NUM_COMMENT_PER_PAGE)
+    paginator = Paginator(topic_list, NUM_COMMENT_PER_PAGE)
     page = request.GET.get('page')
     try:
         topic_list = paginator.page(page)
     except PageNotAnInteger:
         topic_list = paginator.page(1)
     except EmptyPage:
-        topic_list = paginator.page(paginator.num_pages)# 最后一页
+        topic_list = paginator.page(paginator.num_pages)  # 最后一页
 
-    return render(request,'question/node.html',{'topic_list':topic_list,'node':node})
+    return render(request, 'question/node.html', {'topic_list': topic_list, 'node': node})
 
-def topic(request,topic_id):
+
+def topic(request, topic_id):
     try:
         topic = Topic.objects.get(id=topic_id)
     except Topic.DoesNotExist:
-        raise  Http404
+        raise Http404
 
     topic.num_views += 1
     topic.save()
@@ -85,10 +91,9 @@ def topic(request,topic_id):
     faved_num = FavoritedTopic.objects.filter(topic=topic).count()
     if request.user.is_authenticated():
         try:
-            faved_topic = FavoritedTopic.objects.filter(user=request.user,topic=topic)
-        except (User.DoesNotExist,FavoritedTopic.DoesNotExist):
+            faved_topic = FavoritedTopic.objects.filter(user=request.user, topic=topic)
+        except (User.DoesNotExist, FavoritedTopic.DoesNotExist):
             faved_topic = None
-
 
     comment_list = Comment.objects.filter(topic=topic).order_by('created_on')
     paginator = Paginator(comment_list, NUM_COMMENT_PER_PAGE)
@@ -101,7 +106,53 @@ def topic(request,topic_id):
         comment_list = paginator.page(paginator.num_pages)  # 最后一页
 
     form = ReplyForm()
-    return render(request,'question/topic.html',locals())
+    return render(request, 'question/topic.html', locals())
 
-def reply(request,topic_id):
-    pass
+
+@login_required
+def reply(request, topic_id):
+    try:
+        topic = Topic.objects.get(id=topic_id)
+        comment_list = Comment.objects.filter(topic=topic).order_by('created_on')
+        paginator = Paginator(comment_list, NUM_COMMENT_PER_PAGE)
+        page = request.GET.get('page')
+        if page == None:
+            page = paginator.num_pages
+        try:
+            comment_list = paginator.page(page)
+        except PageNotAnInteger:
+            comment_list = paginator.page(1)
+        except EmptyPage:
+            comment_list = paginator.page(paginator.num_pages)  # 最后一页
+
+    except Topic.DoesNotExist:
+        raise Http404
+
+    if request.method == 'POST':
+        form = ReplyForm(request.POST)
+        if form.is_valid():
+            last_comment = Comment.objects.filter(author=request.user).order_by('-created_on')[:1]
+            last_comment = last_comment.first()
+
+            if last_comment and last_comment.content == form.cleaned_data['content'] and (
+                (timezone.now() - last_comment.created_on).seconds < 5):
+                messages.error(request,'你是否正在尝试连续提交两次重复的回复？')
+            else:
+                comment = form.save(commit=False)
+                request.user.comment += 1
+                request.user.calculate_au()
+                request.user.save()
+                comment.author =request.user
+
+                try:
+                    topic = Topic.objects.get(id=topic_id)
+                except Topic.DoesNotExist:
+                    raise  Http404
+                comment.topic = topic
+                comment.save()
+
+                #@ 正则
+                team_name_pattern = re.compile('(?<=@)([0-9a-zA-Z_.]+)',re.UNICODE) # re.UNICODE 匹配中文
+                at_name_list = set(re.findall(team_name_pattern,comment.content))
+                if at_name_list:
+                    
