@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^recent/?$',views.recent,name='recent'),
     url(r'^node/(?P<node_slug>[\w-]+)/$',views.node,name='node'),
     url(r'^topic/(?P<topic_id>\d+)/$',views.topic,name='node'),
+    url(r'^t/(\d+)/reply/?$',views.reply,name='reply'),
         ]

@@ -16,6 +16,7 @@ class Node(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,verbose_name='创建时间')
     updated_on = models.DateTimeField(blank=True,null=True,auto_now=True,verbose_name='更新时间')
     category = models.ForeignKey(Category,verbose_name='所属类别')
+    num_topics = models.IntegerField(default=0, verbose_name='主题数')
     def __str__(self):
         return self.name
 # 文章

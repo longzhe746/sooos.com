@@ -1,6 +1,6 @@
 from django.db.models import Count
 from django.shortcuts import render
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 # Create your views here.
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from myblog.settings import NUM_COMMENT_PER_PAGE, NUM_TOPICS_PER_PAGE
@@ -13,7 +13,7 @@ import datetime
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 import re
-from  django.contrib import messages
+from django.contrib import messages
 
 
 def index(request):
@@ -135,24 +135,81 @@ def reply(request, topic_id):
             last_comment = last_comment.first()
 
             if last_comment and last_comment.content == form.cleaned_data['content'] and (
-                (timezone.now() - last_comment.created_on).seconds < 5):
-                messages.error(request,'你是否正在尝试连续提交两次重复的回复？')
+                    (timezone.now() - last_comment.created_on).seconds < 5):
+                messages.error(request, '你是否正在尝试连续提交两次重复的回复？')
             else:
                 comment = form.save(commit=False)
-                request.user.comment += 1
+                request.user.comment_num += 1
                 request.user.calculate_au()
                 request.user.save()
-                comment.author =request.user
+                comment.author = request.user
 
                 try:
                     topic = Topic.objects.get(id=topic_id)
                 except Topic.DoesNotExist:
-                    raise  Http404
+                    raise Http404
                 comment.topic = topic
                 comment.save()
 
-                #@ 正则
-                team_name_pattern = re.compile('(?<=@)([0-9a-zA-Z_.]+)',re.UNICODE) # re.UNICODE 匹配中文
-                at_name_list = set(re.findall(team_name_pattern,comment.content))
-                if at_name_list:
-                    
+                # @ 正则
+                team_name_pattern = re.compile('(?<=@)([0-9a-zA-Z_.]+)', re.UNICODE)  # re.UNICODE 匹配中文
+                at_name_list = set(re.findall(team_name_pattern, comment.content))
+                if not at_name_list:
+                    pass
+                for at_name in at_name_list:
+                    if at_name != comment.author.username and at_name != comment.topic.author.username:
+                        continue
+                    try:
+                        at_user = User.objects.get(username=at_name)
+                        notice = Notice(from_user=comment.author, to_user=at_user, topic=comment.topic,
+                                        content=comment.content)
+                    except:
+                        pass
+                topic.num_comments += 1
+                topic.updated_on = timezone.now()
+                topic.last_reply = request.user
+                topic.save()
+                return HttpResponseRedirect(reverse('question:topic', args=(topic_id,)))
+
+
+    else:
+        form = ReplyForm()
+    content = {'node': node, 'topic': topic, 'form': form, 'comment_list': comment_list, 'paginator': paginator}
+    return render(request, 'question/topic.html', content)
+
+
+@login_required
+def new(request, node_slug):
+    try:
+        node = Node.objects.get(slug=node_slug)
+    except Node.DoesNotExist:
+        raise Http404
+    # post
+    if request.method == 'POST':
+        form = TopicForm(request.POST)
+        if form.is_valid():
+            last_topic = Topic.objects.filter(author=request.user).order_by('-created_on')[:1]
+            last_topic = last_topic.first()
+            if last_topic and \
+                    last_topic.title == form.cleaned_data['title'] and (
+                    (timezone.now() - last_topic.created_on).seconds < 5):
+
+                messages.error(request, '你是否正在尝试连续提交两次重复的内容？')
+                return HttpResponseRedirect(reverse('question:topic', args=(last_topic.id,)))
+            else:
+                topic = form.save(commit=False)
+                topic.node = node
+                request.user.topic_num += 1
+                request.user.calculate_au()
+                request.user.save()
+                topic.author = request.user
+                topic.last_reply = request.user
+                topic.created_on = timezone.now()
+                topic.save()
+                node.num_topics += 1
+                node.save()
+                # 跳转页面
+                return HttpResponseRedirect(reverse('question:topic', args=(topic.id,)))
+    # get
+    else:
+        pass

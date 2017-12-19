@@ -47,7 +47,7 @@ def gravatar_url_for_user(user,size=None):
 def gravatar_url_for_email(user,size=None):
     gravatar_url = '%savatar/%s' %(GRAVATAR_URL_PREFIX,_get_gravatar_id(user.email))
 
-    parameters = [ p for p in (('d',GRAVATAR_DEFAULT_IMAGE),('s',size or GRAVATAR_DEFAULT_SIZE),('g',GRAVATAR_DEFAULT_RATING))if g[1]]
+    parameters = [ p for p in (('d',GRAVATAR_DEFAULT_IMAGE),('s',size or GRAVATAR_DEFAULT_SIZE),('g',GRAVATAR_DEFAULT_RATING))if p[1]]
     if parameters:
         gravatar_url += '?' + urllib.parse.urlencode(parameters,doseq=True)
     return  gravatar_url
