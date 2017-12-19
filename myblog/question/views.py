@@ -212,4 +212,16 @@ def new(request, node_slug):
                 return HttpResponseRedirect(reverse('question:topic', args=(topic.id,)))
     # get
     else:
-        pass
+        form = TopicForm()
+    return render(request,'question/new.html',{'node':node,'form':form})
+
+@login_required
+def edit(request,topic_id):
+    try:
+        topic = Topic.objects.get(id=topic_id)
+        if topic.author != request.user:
+            raise  Http404
+
+    except Topic.DoesNotExist:
+        raise Http404
+    
