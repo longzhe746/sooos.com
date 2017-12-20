@@ -224,4 +224,18 @@ def edit(request,topic_id):
 
     except Topic.DoesNotExist:
         raise Http404
-    
+
+    if request.method == 'POST':
+        form = TopicForm(request.POST)
+        if form.is_valid():
+            topic.title = form.cleaned_data['title']
+            topic.content = form.cleaned_data['content']
+            topic.updated_on = timezone.now()
+            topic.save()
+
+        return HttpResponseRedirect(reverse('question:topic',args=(topic_id,)))
+
+    else:
+        form = TopicForm(instance=topic)
+
+    return  render(request,'question/edit.html',{'topic':topic,'form':form})

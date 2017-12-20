@@ -1,7 +1,7 @@
 from django import  forms
 from question.models import Topic,Comment
 
-class TopicForm(forms.Form):
+class TopicForm(forms.ModelForm):
     title = forms.CharField(label='标题',required=True)
     content = forms.CharField(label='内容',required=False)
 
@@ -25,7 +25,7 @@ class TopicForm(forms.Form):
         model = Topic
         fields = ('title','content')
 
-class ReplyForm(forms.Form):
+class ReplyForm(forms.ModelForm):
     content = forms.CharField(label='回复',required=False)
     def clean_content(self):
         content = self.cleaned_data.get("content").strip()

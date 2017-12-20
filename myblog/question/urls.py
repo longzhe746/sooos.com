@@ -9,4 +9,6 @@ urlpatterns = [
     url(r'^node/(?P<node_slug>[\w-]+)/$',views.node,name='node'),
     url(r'^topic/(?P<topic_id>\d+)/$',views.topic,name='node'),
     url(r'^t/(\d+)/reply/?$',views.reply,name='reply'),
+    url(r'^node/([\w-]+)/new/?$',views.new,name='new'),
+    url(r'^t/(\d+)/edit/?$',views.edit,name='edit'),
         ]
