@@ -11,4 +11,7 @@ urlpatterns = [
     url(r'^t/(\d+)/reply/?$',views.reply,name='reply'),
     url(r'^node/([\w-]+)/new/?$',views.new,name='new'),
     url(r'^t/(\d+)/edit/?$',views.edit,name='edit'),
+
+    url(r'^notice/?$',views.notice,name='notice'),
+    url(r'^notice/(\d+)/delete/?$',views.notice_delete,name='notice_delete'),
         ]

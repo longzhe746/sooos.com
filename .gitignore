@@ -7,3 +7,16 @@ myblog/.idea/inspectionProfiles/Project_Default.xml
 myblog/.idea/dictionaries/longzhe_hong.xml
 myblog/templates/.DS_Store
 myblog/.DS_Store
+myblog/blog/__pycache__/views.cpython-35.pyc
+*.pyc
+*.pyc
+myblog/question/migrations/0002_node_num_topics.py
+myblog/blog/__pycache__/views.cpython-35.pyc
+myblog/question/__pycache__/models.cpython-35.pyc
+myblog/people/__pycache__/models.cpython-35.pyc
+myblog/blog/__pycache__/views.cpython-35.pyc
+myblog/myblog/__pycache__/settings.cpython-35.pyc
+*.pyc
+myblog/people/__pycache__/models.cpython-35.pyc
+myblog/myblog/__pycache__/urls.cpython-35.pyc
+myblog/question/__pycache__/models.cpython-35.pyc

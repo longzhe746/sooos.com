@@ -239,3 +239,24 @@ def edit(request,topic_id):
         form = TopicForm(instance=topic)
 
     return  render(request,'question/edit.html',{'topic':topic,'form':form})
+
+@login_required
+def notice(request):
+    context = {}
+    if request.method == 'GET':
+        notices = Notice.objects.filter(to_user=request.user,is_deleted=False).order_by('time')
+        context['notices'] = notices
+        return  render(request,'question/notice.html',context)
+
+@login_required
+def notice_delete(request,notice_id):
+        if request.method == 'GET':
+            try:
+                notice = Notice.objects.get(id=notice_id)
+            except Notice.DoesNotExist:
+                raise Http404
+
+            notice.is_deleted = True
+            notice.save()
+
+            return  HttpResponseRedirect(reverse('question:notice'))
