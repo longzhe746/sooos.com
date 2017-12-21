@@ -14,4 +14,8 @@ urlpatterns = [
 
     url(r'^notice/?$',views.notice,name='notice'),
     url(r'^notice/(\d+)/delete/?$',views.notice_delete,name='notice_delete'),
+
+    url(r'^t/fav/(?P<topic_id>\d+)/$',views.fav_topic,name='fav_topic'),
+    url(r'^t/unfav/(?P<topic_id>\d+)/$',views.unfav_topic,name='unfav_topic'),
+
         ]

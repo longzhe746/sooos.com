@@ -260,3 +260,52 @@ def notice_delete(request,notice_id):
             notice.save()
 
             return  HttpResponseRedirect(reverse('question:notice'))
+
+@login_required
+def fav_topic_list(request):
+    faved_topic = FavoritedTopic.objects.filter(user=request.user).all()
+    return render(request,'question/fav_topic.html',locals())
+
+
+
+@login_required
+def fav_topic(request,topic_id):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse('question:index'))
+    try:
+        topic = Topic.objects_get(pk=topic_id)
+        if FavoritedTopic.objects.filter(user=request.user,topic=topic).first():
+            messages.error(request,'主题你已经关注了。')
+        # method 1
+        # fav_topic_new = FavoritedTopic.objects.create(user=request.user,topic=topic)
+        # method 2
+        fav_topic_new = FavoritedTopic(user=request.user,topic=topic)
+        fav_topic_new.save()
+
+    except Topic.DoesNotExist:
+        messages.error(request,'主题不存在')
+        return  HttpResponseRedirect(reverse('question:index'))
+
+    return HttpResponseRedirect(reverse('question:topic', args=(topic_id,)))
+
+
+@login_required
+def unfav_topic(request,topic_id):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse('question:index'))
+    try:
+        topic = Topic.objects_get(pk=topic_id)
+        faved_topic = FavoritedTopic.objects.filter(user=request.user,topic=topic)
+        faved_topic.delete()
+    except Topic.DoesNotExist:
+        messages.error(request,'主题不存在')
+        return HttpResponseRedirect(reverse('question:index'))
+    return HttpResponseRedirect(reverse('question:topic', args=(topic_id,)))
+
+
+
+
+
+
+
+
