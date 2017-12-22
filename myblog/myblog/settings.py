@@ -140,3 +140,12 @@ GRAVATAR_DEFAULT_SIZE = "48"
 
 LOGIN_URL = '/login'
 
+# ------- email settings -----------------
+SITE_URL = 'http;//127.0.0.1:8000'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '1599940638'
+EMAIL_HOST_PASSWORD = 'hong1B523'
+
