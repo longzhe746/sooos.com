@@ -20,7 +20,7 @@ import blog.views as bv
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^blog/', include('blog.urls',namespace='blog')),
-    url(r'^site/', include('sites.urls',namespace='site')),
+    url(r'^sites/', include('sites.urls',namespace='sites')),
     url(r'^', include('question.urls',namespace='question')),
     url(r'^', include('people.urls',namespace='user')),
 

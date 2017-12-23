@@ -8,4 +8,8 @@ urlpatterns = [
     url(r'^follow/(?P<uid>\d+)/$',views.follow,name='follow'),
     url(r'^un_follow/(?P<uid>\d+)/$',views.un_follow,name='un_follow'),
     url(r'^my/following/$',views.following,name='following'),
+    url(r'^au_top/$',views.following,name='au_top'),
+
+    url(r'^login/$',views.following,name='login'),
+    url(r'^register/$',views.following,name='register'),
 ]

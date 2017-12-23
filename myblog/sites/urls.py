@@ -1,6 +1,6 @@
 from django.conf.urls import  url
-from question import  views
+from sites import  views
 
 urlpatterns = [
-
+        url(r'^$', views.index, name='index'),
         ]
