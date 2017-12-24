@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^my/following/$',views.following,name='following'),
     url(r'^au_top/$',views.following,name='au_top'),
 
-    url(r'^login/$',views.following,name='login'),
-    url(r'^register/$',views.following,name='register'),
+    url(r'^login/$',views.login,name='login'),
+    url(r'^register/$',views.register,name='register'),
+    url(r'^logout/$',views.logout,name='logout'),
 ]
