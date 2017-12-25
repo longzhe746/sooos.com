@@ -29,3 +29,5 @@ myblog/question/__pycache__/urls.cpython-35.pyc
 myblog/question/__pycache__/forms.cpython-35.pyc
 myblog/people/__pycache__/urls.cpython-35.pyc
 *.pyc
+myblog/.idea/dataSources.xml
+myblog/.idea/dataSources.local.xml
