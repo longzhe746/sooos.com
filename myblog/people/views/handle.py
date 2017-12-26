@@ -132,3 +132,48 @@ def user(request,uid):
     topic_list = Topic.objects.order_by('-created_on').filter(author=user_from_id.id)[:NUM_TOPICS_PER_PAGE]
     comment_list = Comment.objects.order_by('-created_on').filter(author=user_from_id.id)[:NUM_TOPICS_PER_PAGE]
     return render(request,'people/user.html',locals())
+
+def user_topics(request,uid):
+    this_user = Member.objects.get(pk=uid)
+    topic_list = Topic.objects.order_by('-created_on').filter(author=uid)
+    paginator = Paginator(topic_list,NUM_TOPICS_PER_PAGE)
+
+    page = request.GET.get('page')
+    try:
+        topic_list = paginator.page(page)
+    except PageNotAnInteger:
+        topic_list = paginator.page(1)
+    except EmptyPage:
+        topic_list = paginator.page(paginator.num_pages)
+
+    return  render(request,'people/user_topics.html',locals())
+
+def user_comments(request,uid):
+    this_user = Member.objects.get(pk=uid)
+    comment_list = Comment.objects.filter(author=uid).order_by('-created_on')
+    paginator = Paginator(comment_list, NUM_COMMENT_PER_PAGE)
+
+    page = request.GET.get('page')
+    try:
+        comment_list = paginator.page(page)
+    except PageNotAnInteger:
+        comment_list = paginator.page(1)
+    except EmptyPage:
+        comment_list = paginator.page(paginator.num_pages)
+
+    return render(request, 'people/user_comments.html', locals())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
