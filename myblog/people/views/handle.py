@@ -175,13 +175,12 @@ def send_verified_email(request):
         return HttpResponseRedirect(reverse('user:settings'))
     try:
         last_email = Email.objects.get(user=user)
-        if (timezone.now() - last_email.timestamp).seconds < 60:
-            messages.error(request, '一分钟之内只能申请一次.')
 
     except Email.DoesNotExist:
         pass
 
-
+    if (timezone.now() - last_email.timestamp).seconds < 60:
+        messages.error(request, '一分钟之内只能申请一次.')
     else:
         try:
             email = Email.objects.get(user=user)
@@ -189,7 +188,48 @@ def send_verified_email(request):
             email.timestamp = timezone.now()
             email.save()
         except Email.DoesNotExist:
-            pass
+            email = Email(user=user)
+            email.token = email.generate_token()
+            email.save()
+
+        finally:
+            send_mail("欢迎加入", "%s 你好：\r\n请点击链接验证你的邮箱：%s%s，" % (
+                user.username, SITE_URL, reverse('user:email_verified', args=(user.id, email.token))),
+                      "1599940638@qq.com", [user.email])
+            messages.success(request, '恭喜注册成功，请去您的邮箱验证。如果查不到邮件，那么可以垃圾邮箱中查收以下。')
+
+    return HttpResponseRedirect(reverse('user:settings'))
+
+def email_verified(request,uid,token):
+    try:
+        user = Member.objects.get(pk=uid)
+        email = Email.objects.get(user=user)
+    except Member.DoesNotExist:
+        raise Http404
+    except Email.DoesNotExist:
+        raise Http404
+
+    else:
+        if email.token == token:
+            user.email_verified = True
+            user.save()
+            email.delete()
+            messages.success(request,'验证成功')
+            if not request.user.is_authenticated():
+                auth_login(request.user)
+            return  HttpResponseRedirect(reverse('question:index'))
+        else:
+            raise Http404
+
+
+
+
+
+
+
+
+
+
 
 
 
