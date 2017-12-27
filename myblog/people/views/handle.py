@@ -164,6 +164,35 @@ def user_comments(request,uid):
     return render(request, 'people/user_comments.html', locals())
 
 
+@login_required
+@csrf_protect
+def send_verified_email(request):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse('user:settings'))
+    user = request.user
+    if user.email_verified:
+        messages.error(request,'您的邮箱已经验证过了.')
+        return HttpResponseRedirect(reverse('user:settings'))
+    try:
+        last_email = Email.objects.get(user=user)
+        if (timezone.now() - last_email.timestamp).seconds < 60:
+            messages.error(request, '一分钟之内只能申请一次.')
+
+    except Email.DoesNotExist:
+        pass
+
+
+    else:
+        try:
+            email = Email.objects.get(user=user)
+            email.token = email.generate_token()
+            email.timestamp = timezone.now()
+            email.save()
+        except Email.DoesNotExist:
+            pass
+
+
+
 
 
 

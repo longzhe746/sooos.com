@@ -51,8 +51,8 @@ class Member(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = 'email' # 用户登录名换成 电子邮件
+    REQUIRED_FIELDS = ['username'] # 必输字段
 
     object = MyUserManager()
 
