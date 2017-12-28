@@ -225,6 +225,7 @@ def email_verified(request,uid,token):
 def find_password(request):
     if request.method == 'GET':
         return render(request,'people/find_password.html')
+
     email = request.POST.get['email']
     user = None
     try:
@@ -238,17 +239,54 @@ def find_password(request):
         if (timezone.now() - find_pass.timestamp).seconds < 60:
             messages.error(request,'一分钟内不可以重复找回密码.')
             return HttpResponseRedirect(reverse('people:login'))
-        else:
-            find_pass = FindPass(user=user)
-            find_pass.token=find_pass.generate_token()
-            find_pass.save()
+    else:
+        find_pass = FindPass(user=user)
+        find_pass.token=find_pass.generate_token()
+    find_pass.save()
 
-        send_mail("重置密码",
-                  "%s 你好：\r\n请点击链接重置密码:：%s%s，" % (
-                      user.username, SITE_URL, reverse('user:first_reset_password', args=(user.id, ))),
-                  "1599940638@qq.com",
-                  [user.email])
-        messages.success(request, '恭喜注册成功，请去您的邮箱验证。如果查不到邮件，那么可以垃圾邮箱中查收以下。')
+    send_mail("重置密码",
+              "%s 你好：\r\n请点击链接重置密码:：%s%s，" % (
+                  user.username, SITE_URL, reverse('user:first_reset_password', args=(user.id, find_pass.token))),
+              "1599940638@qq.com",
+              [email])
+    messages.success(request, '密码找回邮件已发送到您的邮箱里。')
+    return HttpResponseRedirect(reverse('question:index'))
+
+
+def first_reset_password(request,uid=None,token=None):
+    user = Member.objects.get(pk=uid)
+    find_pass = FindPass.objects.filter(user=user)
+    if not find_pass:
+        messages.error(request,'错误')
+        return HttpResponseRedirect(reverse('user:find_pass'))
+
+    find_pass = find_pass[0]
+    now = timezone.now()
+    timestamp = find_pass.timestamp
+    if int(now.strftime('%Y%m%d')) - int(timestamp.strftime('%Y%m%d')) < 3:
+        if find_pass.token == token:
+            if __name__ == '__main__':
+                request.session['find_pass'] = uid
+                return  render(request,'people/reset_password.html')
+            else:
+                raise Http404
+
+
+
+    else:
+        raise Http404
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
