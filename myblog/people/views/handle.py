@@ -222,7 +222,33 @@ def email_verified(request,uid,token):
             raise Http404
 
 
+def find_password(request):
+    if request.method == 'GET':
+        return render(request,'people/find_password.html')
+    email = request.POST.get['email']
+    user = None
+    try:
+        user = Member.objects.get(email=email)
+    except Member.DoesNotExist:
+        messages.error(request,'未找到用户')
 
+    find_pass= FindPass.objects.filter(user=user)
+    if find_pass:
+        find_pass = find_pass[0]
+        if (timezone.now() - find_pass.timestamp).seconds < 60:
+            messages.error(request,'一分钟内不可以重复找回密码.')
+            return HttpResponseRedirect(reverse('people:login'))
+        else:
+            find_pass = FindPass(user=user)
+            find_pass.token=find_pass.generate_token()
+            find_pass.save()
+
+        send_mail("重置密码",
+                  "%s 你好：\r\n请点击链接重置密码:：%s%s，" % (
+                      user.username, SITE_URL, reverse('user:first_reset_password', args=(user.id, ))),
+                  "1599940638@qq.com",
+                  [user.email])
+        messages.success(request, '恭喜注册成功，请去您的邮箱验证。如果查不到邮件，那么可以垃圾邮箱中查收以下。')
 
 
 
