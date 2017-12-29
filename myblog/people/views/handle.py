@@ -265,14 +265,33 @@ def first_reset_password(request,uid=None,token=None):
     timestamp = find_pass.timestamp
     if int(now.strftime('%Y%m%d')) - int(timestamp.strftime('%Y%m%d')) < 3:
         if find_pass.token == token:
-            if __name__ == '__main__':
                 request.session['find_pass'] = uid
                 return  render(request,'people/reset_password.html')
-            else:
-                raise Http404
 
+        else:
+            raise Http404
+    else:
+        raise Http404
 
+def reset_password(request):
+    if request.method=='GET':
+        raise Http404
 
+    password = request.POST.get['password']
+
+    if len(password) < 6:
+        messages.error(request,'密码长度不能少于六位')
+        return render(request,'people/reset_password.html')
+
+    uid=request.settion['find_pass']
+    user = Member.objects.get(pk=uid)
+    if user:
+        user.set_password(password)
+        user.save()
+        FindPass.objects.get(user=user).delete()
+        del request.session['find_pass']
+        messages.success(request,'重置成功,请登录')
+        return HttpResponseRedirect(reverse('user:login'))
     else:
         raise Http404
 
