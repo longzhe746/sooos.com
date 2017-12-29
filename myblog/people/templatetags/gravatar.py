@@ -37,7 +37,7 @@ def gravatar(user,size=None):
 @register.simple_tag
 def gravatar_url_for_user(user,size=None):
     if user.avatar and user.avatar != '':
-        img = '' + user.avatar
+        img = 'http://p1q9bkv61.bkt.clouddn.com/' + user.avatar
         return  img
     else:
         email = _get_user(user)
