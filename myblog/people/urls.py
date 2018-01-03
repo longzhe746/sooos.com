@@ -24,7 +24,10 @@ urlpatterns = [
     url(r'^find_password/$',views.find_password,name='find_pass'),
     url(r'^reset_password/(?P<uid>\d+)/(?P<token>\w+)/$',views.first_reset_password,name='first_reset_password'),
     url(r'^reset_password/$',views.reset_password,name='reset_password'),
-
+    #reset_password
     url(r'^settings/$',views.profile,name='settings'),
     url(r'^password/$',views.password,name='password'),
+
+    url(r'^settings/upload_headimage/$', views.upload_headimage, name='upload_headimage'),
+    url(r'^settings/delete_headimage/$', views.delete_headimage, name='delete_headimage'),
 ]

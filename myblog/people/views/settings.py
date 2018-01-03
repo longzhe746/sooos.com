@@ -76,3 +76,48 @@ def password(request):
         form = PasswordChangeForm()
 
     return render(request, 'people/password.html', {'form': form})
+
+#upload_headimgae
+@csrf_protect
+@login_required
+def upload_headimage(request):
+    user = request.user
+    if request.method == 'POST':
+        print(request.GET)
+        try:
+            retstr = request.GET.get('upload_ret')
+            retstr = retstr.encode('utf-8')
+            dec = base64.urlsafe_b64decode(retstr)
+            ret = json.loads(dec)
+            if ret and ret['key']:
+                request.user.avatar = ret['key']
+                print(ret['key'])
+                request.user.save()
+            else:
+                raise Http404
+            messages.success(request,'头像上传成功')
+        except:
+            messages.error(request,'头像上传失败')
+    return HttpResponseRedirect(reverse('user:settings'))
+
+
+@csrf_protect
+@login_required
+def delete_headimage(request):
+    user = request.user
+
+    if user.avatar == None or user.avatar=='':
+        messages.error(request,'你还没有上传头像')
+    else:
+        q = Auth(AK,SK)
+        buket = BucketManager(q)
+        buket_name = 'avatar'
+        ret,info = buket.delete(buket_name,user.avatar)
+        if ret is None:
+            messages.error(request,'头像删除失败')
+        else:
+            user.avatar = ''
+            user.save()
+            messages.success(request,'头像删除成功')
+
+    return HttpResponseRedirect(reverse('user:settings'))
